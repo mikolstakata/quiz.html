@@ -1,0 +1,173 @@
+
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quiz HTML i CSS</title>
+<style>
+:root{--primary:#4263eb;--purple:#7048e8;--bg:#f3f6fc;--text:#172554;--muted:#64748b;--green:#16a34a}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);font-family:system-ui,-apple-system,sans-serif;color:var(--text);min-height:100vh}
+header{background:linear-gradient(120deg,#2563eb,#7048e8);color:white;padding:25px 20px}
+.head{max-width:850px;margin:auto;display:flex;align-items:center;gap:16px}
+.logo{font-size:40px;font-weight:800}
+h1{font-size:clamp(23px,4vw,32px);margin:0}
+header p{margin:4px 0 0;color:#e0e7ff}
+main{max-width:810px;margin:36px auto;padding:0 16px 30px}
+.card{background:white;border:1px solid #e2e8f0;border-radius:16px;padding:clamp(20px,4vw,32px);box-shadow:0 8px 30px #1e293b0c}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
+.top strong{font-size:17px}
+.tag{background:#e0e7ff;color:#3730a3;padding:6px 13px;border-radius:20px;font-size:13px;font-weight:700}
+.track{height:8px;border-radius:8px;background:#e2e8f0;overflow:hidden;margin-bottom:26px}
+#bar{height:100%;width:10%;background:linear-gradient(90deg,#2563eb,#7048e8);transition:width .3s}
+h2{font-size:clamp(20px,3vw,25px);line-height:1.4;margin:0 0 24px}
+.answers{display:grid;gap:12px}
+.answer{display:flex;align-items:center;text-align:left;gap:14px;width:100%;padding:13px 15px;border:2px solid #e2e8f0;border-radius:11px;background:white;color:var(--text);font:inherit;font-size:16px;cursor:pointer;transition:.2s}
+.answer:hover:not(:disabled){border-color:var(--primary);background:#f5f7ff;transform:translateY(-1px)}
+.letter{display:grid;place-items:center;flex-shrink:0;width:35px;height:35px;border-radius:50%;background:#edf1f9;font-weight:800}
+.answer.correct{border-color:#22c55e;background:#f0fdf4}
+.answer.correct .letter{background:#16a34a;color:white}
+.answer.wrong{border-color:#ef4444;background:#fef2f2}
+.answer.wrong .letter{background:#ef4444;color:white}
+.answer:disabled{cursor:default}
+.footer{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:24px}
+.score{color:var(--muted);font-size:14px}
+button.primary{border:0;border-radius:11px;padding:13px 22px;background:var(--primary);color:white;font:inherit;font-weight:700;cursor:pointer;transition:.2s}
+button.primary:hover{filter:brightness(.92)}
+button.primary:disabled{opacity:.45;cursor:not-allowed}
+#next{background:var(--green);min-width:180px}
+.result{text-align:center}
+.check{width:65px;height:65px;border-radius:50%;background:#dcfce7;color:#16a34a;display:grid;place-items:center;font-size:35px;margin:0 auto 14px}
+.result h2{font-size:29px;margin-bottom:8px}
+.bigscore{font-size:18px;margin:10px 0 20px}
+.bigscore b{color:var(--green)}
+.gradebox{background:#f0fdf4;border:1px solid #dcfce7;border-radius:12px;padding:15px;margin:20px 0}
+.gradebox span{display:block;font-size:14px}
+.gradebox strong{display:block;color:var(--green);font-size:40px}
+.scale{display:grid;grid-template-columns:repeat(6,1fr);border:1px solid #e2e8f0;border-radius:12px;padding:8px;margin:20px 0}
+.scale div{padding:8px 2px;border-right:1px solid #e2e8f0;font-size:13px;color:var(--muted)}
+.scale div:last-child{border:0}
+.scale b{display:block;font-size:17px;color:var(--text);margin-top:4px}
+.scale .active{background:#dcfce7;border-radius:8px;color:#166534;font-weight:800}
+.scale .active b{color:#15803d}
+#restart{background:linear-gradient(120deg,#4f46e5,#7048e8);min-width:210px}
+.hidden{display:none!important}
+@media(max-width:480px){header{padding:20px 16px}.logo{font-size:30px}main{margin-top:20px;padding-inline:12px}.answer{font-size:14px;padding:11px;gap:10px}.letter{width:31px;height:31px}.footer{align-items:stretch;flex-direction:column-reverse}.footer button{width:100%}.score{text-align:center}.scale div{font-size:11px}.scale b{font-size:15px}}
+</style>
+</head>
+<body>
+<header>
+<div class="head">
+<div class="logo">&lt;/&gt;</div>
+<div><h1>Quiz HTML i CSS</h1><p>Sprawdź swoją wiedzę z HTML i podstaw CSS</p></div>
+</div>
+</header>
+<main>
+<section class="card" id="quiz">
+<div class="top"><strong id="counter">Pytanie 1 z 10</strong><span class="tag" id="category">HTML</span></div>
+<div class="track"><div id="bar"></div></div>
+<h2 id="question"></h2>
+<div class="answers" id="answers"></div>
+<div class="footer"><span class="score" id="liveScore">Wybierz odpowiedź</span><button class="primary" id="next" disabled>Następne pytanie →</button></div>
+</section>
+<section class="card result hidden" id="result" aria-live="polite">
+<div class="check">✓</div>
+<h2>Koniec quizu!</h2>
+<p class="bigscore">Poprawne odpowiedzi: <b id="points">0 / 10</b></p>
+<div class="gradebox"><span>Twoja ocena:</span><strong id="grade">1</strong></div>
+<div class="scale" id="scale">
+<div data-grade="1">0–4<b>1</b></div>
+<div data-grade="2">5<b>2</b></div>
+<div data-grade="3">6<b>3</b></div>
+<div data-grade="4">7–8<b>4</b></div>
+<div data-grade="5">9<b>5</b></div>
+<div data-grade="6">10<b>6</b></div>
+</div>
+<button class="primary" id="restart">↻ Zagraj ponownie</button>
+</section>
+</main>
+<script>
+const bank=[
+{c:"HTML",q:"Do czego służy znacznik <head>?",a:["Do przechowywania metadanych","Do tworzenia nagłówka strony","Do wyświetlania stopki","Do wstawiania obrazów"],k:0},
+{c:"HTML",q:"Który znacznik tworzy największy nagłówek?",a:["<h6>","<head>","<h1>","<header>"],k:2},
+{c:"HTML",q:"Jaki znacznik tworzy odnośnik?",a:["<link>","<a>","<href>","<url>"],k:1},
+{c:"HTML",q:"Który atrybut określa adres obrazka?",a:["href","alt","src","title"],k:2},
+{c:"HTML",q:"Jaki znacznik tworzy akapit?",a:["<p>","<text>","<para>","<br>"],k:0},
+{c:"HTML",q:"Jak utworzyć listę uporządkowaną?",a:["<ul>","<li>","<dl>","<ol>"],k:3},
+{c:"HTML",q:"Który znacznik tworzy nowy wiersz tabeli?",a:["<td>","<tr>","<th>","<table-row>"],k:1},
+{c:"HTML",q:"Jaki atrybut opisuje obraz dla czytników?",a:["src","title","alt","name"],k:2},
+{c:"HTML",q:"Który znacznik tworzy pole tekstowe formularza?",a:["<input>","<formtext>","<field>","<text>"],k:0},
+{c:"HTML",q:"Jak zadeklarować HTML5?",a:["<html5>","<!DOCTYPE html>","<doctype>","<!HTML>"],k:1},
+{c:"HTML",q:"Który znacznik oznacza ważną treść?",a:["<i>","<small>","<strong>","<mark>"],k:2},
+{c:"HTML",q:"Jaki znacznik osadza film?",a:["<media>","<movie>","<video>","<film>"],k:2},
+{c:"HTML",q:"Co oznacza atrybut href?",a:["Adres docelowy odnośnika","Opis obrazka","Kolor tekstu","Typ dokumentu"],k:0},
+{c:"HTML",q:"Który znacznik definiuje stopkę sekcji?",a:["<bottom>","<footer>","<end>","<aside>"],k:1},
+{c:"HTML",q:"Jaki znacznik tworzy pole wyboru?",a:["<input type=\"check\">","<select type=\"box\">","<checkbox>","<input type=\"checkbox\">"],k:3},
+{c:"CSS",q:"Do czego służy CSS?",a:["Do stylizacji strony","Do tworzenia baz danych","Do przesyłania plików","Do pisania zapytań SQL"],k:0},
+{c:"CSS",q:"Jak wybrać element o id=\"menu\"?",a:[".menu","menu","#menu","*menu"],k:2},
+{c:"CSS",q:"Jak wybrać elementy klasy box?",a:["#box","box","*box",".box"],k:3},
+{c:"CSS",q:"Która właściwość zmienia kolor tekstu?",a:["background","font-style","color","text-color"],k:2},
+{c:"CSS",q:"Która właściwość zmienia tło?",a:["background-color","text-background","bgcolor","color-bg"],k:0},
+{c:"CSS",q:"Jak ustawić tekst na środku?",a:["text-align:center","align:center","font-align:center","position:text"],k:0},
+{c:"CSS",q:"Co ustawia margin?",a:["Kolor obramowania","Odstęp zewnętrzny","Rozmiar tekstu","Odstęp wewnętrzny"],k:1},
+{c:"CSS",q:"Co ustawia padding?",a:["Odstęp wewnętrzny","Cień elementu","Grubość tekstu","Odstęp między literami"],k:0},
+{c:"CSS",q:"Która właściwość zmienia rozmiar tekstu?",a:["text-size","font-size","size-font","font-weight"],k:1},
+{c:"CSS",q:"Jak zaokrąglić rogi elementu?",a:["corner-radius","border-round","border-radius","radius"],k:2}
+];
+const $=id=>document.getElementById(id);
+let questions=[],index=0,score=0,locked=false;
+function shuffle(arr){for(let i=arr.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]]}return arr}
+function start(){
+questions=shuffle([...bank]).slice(0,10);index=0;score=0;locked=false;
+$("quiz").classList.remove("hidden");$("result").classList.add("hidden");
+render();
+}
+function render(){
+locked=false;
+const item=questions[index];
+$("counter").textContent=`Pytanie ${index+1} z 10`;
+$("category").textContent=item.c;
+$("bar").style.width=`${index*10}%`;
+$("question").textContent=item.q;
+$("answers").replaceChildren();
+item.a.forEach((answer,i)=>{
+const btn=document.createElement("button");
+btn.className="answer";
+const letter=document.createElement("span");letter.className="letter";letter.textContent="ABCD"[i];
+const text=document.createElement("span");text.textContent=answer;
+btn.append(letter,text);btn.addEventListener("click",()=>choose(i));$("answers").append(btn);
+});
+$("liveScore").textContent="Wybierz odpowiedź";
+$("next").disabled=true;
+$("next").textContent=index===9?"Zobacz wynik ✓":"Następne pytanie →";
+}
+function choose(choice){
+if(locked)return;locked=true;
+const item=questions[index];
+[...$("answers").children].forEach((btn,i)=>{
+btn.disabled=true;
+if(i===item.k)btn.classList.add("correct");
+else if(i===choice)btn.classList.add("wrong");
+});
+if(choice===item.k)score++;
+$("liveScore").textContent=choice===item.k?"✓ Poprawna odpowiedź":"✕ Błędna odpowiedź";
+$("bar").style.width=`${(index+1)*10}%`;
+$("next").disabled=false;
+}
+function finish(){
+$("quiz").classList.add("hidden");$("result").classList.remove("hidden");
+const grade=score<=4?1:score===5?2:score===6?3:score<=8?4:score===9?5:6;
+$("points").textContent=`${score} / 10`;
+$("grade").textContent=grade;
+document.querySelectorAll("#scale div").forEach(el=>el.classList.toggle("active",+el.dataset.grade===grade));
+}
+$("next").addEventListener("click",()=>{
+if(!locked)return;
+if(index===9)finish();else{index++;render()}
+});
+$("restart").addEventListener("click",start);
+start();
+</script>
+</body>
+</html>
